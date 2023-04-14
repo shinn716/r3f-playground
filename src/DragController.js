@@ -1,7 +1,7 @@
-import { DragControls } from "three/addons/controls/DragControls.js";
-import { Utils } from "./Utils";
+import { DragControls } from "three/examples/jsm/controls/DragControls";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import { forwardRef, useEffect, useImperativeHandle } from "react";
+import { Utils } from "./Utils";
 
 const DragController = forwardRef((props, ref) => {
   const { camera, gl } = useThree();
