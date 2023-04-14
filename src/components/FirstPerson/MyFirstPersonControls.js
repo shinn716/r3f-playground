@@ -15,7 +15,6 @@ var counting = 0;
 var height = 0.5;
 var enableKeyboard = true;
 var enable = true;
-
 var runner;
 
 export default class MyFirstPersonControls {
@@ -30,27 +29,29 @@ export default class MyFirstPersonControls {
 
   Init() {
     const raycaster_mover = new THREE.Raycaster();
+    const raycaster_click = new THREE.Raycaster();
     const mouse_move = new THREE.Vector2();
+    const pointer_click = new THREE.Vector2();
 
     const handleKeyDown = (e) => {
-      if (e.key == "w") keyPressed[0] = true;
-      if (e.key == "a") keyPressed[1] = true;
-      if (e.key == "s") keyPressed[2] = true;
-      if (e.key == "d") keyPressed[3] = true;
+      if (e.key === "w") keyPressed[0] = true;
+      if (e.key === "a") keyPressed[1] = true;
+      if (e.key === "s") keyPressed[2] = true;
+      if (e.key === "d") keyPressed[3] = true;
     };
     const handleKeyUp = (e) => {
-      if (e.key == "w") keyPressed[0] = false;
-      if (e.key == "a") keyPressed[1] = false;
-      if (e.key == "s") keyPressed[2] = false;
-      if (e.key == "d") keyPressed[3] = false;
+      if (e.key === "w") keyPressed[0] = false;
+      if (e.key === "a") keyPressed[1] = false;
+      if (e.key === "s") keyPressed[2] = false;
+      if (e.key === "d") keyPressed[3] = false;
     };
 
-    document.onmousedown = function (e) {
+    document.onpointerdown = function (e) {
       if (enable) dragFlag = true;
     };
 
     // listener
-    document.onmouseup = function (e) {
+    document.onpointerup = function (e) {
       if (!MyFirstPersonControls.enable) return;
       if (!enable) return;
 
@@ -62,10 +63,13 @@ export default class MyFirstPersonControls {
       if (isClick) {
         isClick = false;
       } else {
-        const intersects = raycaster_mover.intersectObjects(scene.children);
+        pointer_click.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer_click.y = -(e.clientY / window.innerHeight) * 2 + 1;
+        raycaster_click.setFromCamera(pointer_click, camera);
+        const intersects = raycaster_click.intersectObjects(scene.children);
         if (intersects.length > 0) {
-          if (intersects[0].object.name == "") return;
-          if (intersects[0].object.name == "floor") {
+          if (intersects[0].object.name === "") return;
+          if (intersects[0].object.name === "floor") {
             new TWEEN.Tween(camera.position)
               .to(
                 {
@@ -82,7 +86,7 @@ export default class MyFirstPersonControls {
       }
     };
 
-    document.onmousemove = function (e) {
+    document.onpointermove = function (e) {
       if (!MyFirstPersonControls.enable) return;
       if (!enable) return;
       if (isClick) {
@@ -127,7 +131,7 @@ export default class MyFirstPersonControls {
     });
     var runnerGeometry = new THREE.PlaneGeometry(0.15, 0.15, 1, 1);
     runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-    runner.position.set(-100, 100, 0);
+    runner.position.set(-100, -100, 0);
     scene.add(runner);
   }
 
@@ -137,7 +141,7 @@ export default class MyFirstPersonControls {
     TWEEN.update();
     if (dragFlag) {
       counting++;
-      if (counting > 15) isClick = true;
+      if (counting > 20) isClick = true;
     }
 
     if (!enableKeyboard) return;

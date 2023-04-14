@@ -7,7 +7,7 @@ import MyFirstPersonControls from "./MyFirstPersonControls";
 const FirstPerson = forwardRef((props, ref) => {
   const { camera } = useThree();
   const { scene } = useThree();
-  let controller;
+  const controller = new MyFirstPersonControls(camera, scene, true);
 
   useImperativeHandle(ref, () => ({
     enable(_value) {
@@ -19,9 +19,10 @@ const FirstPerson = forwardRef((props, ref) => {
     // console.log("init");
     // controller.Enable(false);
 
-    controller = new MyFirstPersonControls(camera, scene, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     controller.CreateFootprint(scene);
-    controller.CreateWalkArea(0);
+    controller.CreateWalkArea(0.1);
+    controller.Enable(true);
   }, []);
   useFrame(() => {
     controller?.Update();
