@@ -1,5 +1,5 @@
 import { DragControls } from "three/examples/jsm/controls/DragControls";
-import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
+import { useThree } from "@react-three/fiber";
 import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { Utils } from "./Utils";
 
@@ -23,10 +23,12 @@ const DragController = forwardRef((props, ref) => {
         const raycaster = controls.getRaycaster();
         const hits = raycaster.intersectObjects(scene.children);
 
+        if (hits[0] === undefined) return;
+
         if (
-          hits[0].object.name != "floor" &&
-          hits[0].object.name != "" &&
-          hits[0].object.name != "cube"
+          hits[0].object.name !== "floor" &&
+          hits[0].object.name !== "" &&
+          hits[0].object.name !== "cube"
         ) {
           event.object.position.set(
             hits[0].point.x,
