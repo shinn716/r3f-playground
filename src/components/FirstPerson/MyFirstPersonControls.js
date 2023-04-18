@@ -16,10 +16,9 @@ var height = 0.5;
 var enableKeyboard = true;
 var enable = true;
 var runner;
+var lastX, lastY;
 
 export default class MyFirstPersonControls {
-  static enable = true;
-
   constructor(_camera, _scene, _enableKeyboard) {
     camera = _camera;
     scene = _scene;
@@ -48,17 +47,18 @@ export default class MyFirstPersonControls {
 
     document.onpointerdown = function (e) {
       if (enable) dragFlag = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
     };
 
     // listener
     document.onpointerup = function (e) {
-      if (!MyFirstPersonControls.enable) return;
       if (!enable) return;
 
-      this.mx = 0;
-      this.my = 0;
       dragFlag = false;
       counting = 0;
+      lastX = 0;
+      lastY = 0;
 
       if (isClick) {
         isClick = false;
@@ -87,31 +87,34 @@ export default class MyFirstPersonControls {
     };
 
     document.onpointermove = function (e) {
-      if (!MyFirstPersonControls.enable) return;
       if (!enable) return;
       if (isClick) {
-        this.mx = e.movementX;
-        this.my = e.movementY;
+        var deltaX = e.clientX - lastX;
+        var deltaY = e.clientY - lastY;
 
-        camry += ((-this.mx * Math.PI) / 180) * dragSpeed;
-        camrx += ((-this.my * Math.PI) / 180) * dragSpeed;
+        camry += ((-deltaX * Math.PI) / 180) * dragSpeed;
+        camrx += ((-deltaY * Math.PI) / 180) * dragSpeed;
+
         const euler = new THREE.Euler(0, 0, 0, "YXZ");
         euler.x = camrx;
         euler.y = camry;
         camera.quaternion.setFromEuler(euler);
         runner.visible = false;
+
+        lastX = e.clientX;
+        lastY = e.clientY;
       } else {
         mouse_move.x = (e.clientX / window.innerWidth) * 2 - 1;
         mouse_move.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster_mover.setFromCamera(mouse_move, camera);
         const hits = raycaster_mover.intersectObjects(scene.children);
+        if (runner === undefined) return;
         runner.position.set(hits[0].point.x, 0.05, hits[0].point.z);
         runner.lookAt(
           camera.position.x,
           camera.position.y + 90,
           camera.position.z
         );
-
         runner.visible = true;
       }
     };
@@ -136,12 +139,11 @@ export default class MyFirstPersonControls {
   }
 
   Update() {
-    if (!MyFirstPersonControls.enable) return;
     if (!enable) return;
     TWEEN.update();
     if (dragFlag) {
       counting++;
-      if (counting > 20) isClick = true;
+      if (counting > 15) isClick = true;
     }
 
     if (!enableKeyboard) return;
