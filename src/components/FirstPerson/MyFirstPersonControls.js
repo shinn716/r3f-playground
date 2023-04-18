@@ -15,7 +15,7 @@ var counting = 0;
 var height = 0.5;
 var enableKeyboard = true;
 var enable = true;
-var runner;
+var footprint;
 var lastX, lastY;
 
 export default class MyFirstPersonControls {
@@ -99,7 +99,7 @@ export default class MyFirstPersonControls {
         euler.x = camrx;
         euler.y = camry;
         camera.quaternion.setFromEuler(euler);
-        runner.visible = false;
+        footprint.visible = false;
 
         lastX = e.clientX;
         lastY = e.clientY;
@@ -108,14 +108,14 @@ export default class MyFirstPersonControls {
         mouse_move.y = -(e.clientY / window.innerHeight) * 2 + 1;
         raycaster_mover.setFromCamera(mouse_move, camera);
         const hits = raycaster_mover.intersectObjects(scene.children);
-        if (runner === undefined) return;
-        runner.position.set(hits[0].point.x, 0.05, hits[0].point.z);
-        runner.lookAt(
+        if (footprint === undefined) return;
+        footprint.position.set(hits[0].point.x, 0.05, hits[0].point.z);
+        footprint.lookAt(
           camera.position.x,
           camera.position.y + 90,
           camera.position.z
         );
-        runner.visible = true;
+        footprint.visible = true;
       }
     };
 
@@ -126,16 +126,16 @@ export default class MyFirstPersonControls {
   }
 
   CreateFootprint(scene) {
-    // Init runner
+    // Init footprint
     var runnerMaterial = new THREE.MeshBasicMaterial({
       map: new THREE.TextureLoader().load("icons/footprints.png"),
       alphaTest: true,
       side: THREE.DoubleSide,
     });
     var runnerGeometry = new THREE.PlaneGeometry(0.15, 0.15, 1, 1);
-    runner = new THREE.Mesh(runnerGeometry, runnerMaterial);
-    runner.position.set(-100, -100, 0);
-    scene.add(runner);
+    footprint = new THREE.Mesh(runnerGeometry, runnerMaterial);
+    footprint.position.set(-100, -100, 0);
+    scene.add(footprint);
   }
 
   Update() {
