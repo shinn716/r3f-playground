@@ -18,7 +18,5 @@ export function Booth() {
       }
     }
   );
-  return (
-    <primitive position={[-0.2, 0, -0.1]} object={gltf.scene} scale={0.3} />
-  );
+  return <primitive position={[-0.2, 0, -0.1]} object={gltf.scene} scale={1} />;
 }

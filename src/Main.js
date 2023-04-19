@@ -37,13 +37,14 @@ const Scene = () => {
 
   useEffect(() => {
     for (let i = 0; i < scene.children.length; i++) {
-      if (scene.children[i].name === "Sketchfab_Scene") {
-        camera.position.set(
-          scene.children[i].position.x,
-          0.17 * 3,
-          scene.children[i].position.z
-        );
-      } else if (scene.children[i].name === "cube") {
+      // if (scene.children[i].name === "Sketchfab_Scene") {
+      //   camera.position.set(
+      //     scene.children[i].position.x,
+      //     0.17 * 3,
+      //     scene.children[i].position.z
+      //   );
+      // }
+      if (scene.children[i].name === "cube") {
         objects.push(scene.children[i]);
       }
     }
@@ -57,6 +58,11 @@ const Scene = () => {
         controlsref.current.enable(true);
       }
     );
+
+    // set camera transfrom
+    controlsref.current.setHeight(1.7);
+    controlsref.current.setPosition(-0.24, 1.7, 0.1);
+    controlsref.current.setRotation(0, -90, 0);
   }, []);
 
   return (
@@ -65,12 +71,12 @@ const Scene = () => {
       <DragController ref={dragref} />
       <Box
         color={Math.random() * 0xffffff}
-        position={[0.41, 0.58, -0.15]}
+        position={[1.8, 1.8, -0.3]}
         rotation={[0, -1.57, 0]}
       />
       <Box
         color={Math.random() * 0xffffff}
-        position={[0.41, 0.61, -0.02]}
+        position={[1.8, 1.8, 0.1]}
         rotation={[0, -1.57, 0]}
       />
     </>
@@ -82,9 +88,9 @@ function Box({ position, rotation, color }) {
   return (
     <group name="cube">
       <mesh name="cube" position={position} rotation={rotation} ref={ref}>
-        <boxBufferGeometry args={[0.1, 0.1, 0.01]} attach="geometry" />
+        <boxBufferGeometry args={[0.35, 0.35, 0.02]} attach="geometry" />
         <meshPhongMaterial color={color} attach="material" />
-        <axesHelper args={[0.1, 0.1, 0.1]} layers={2} />
+        <axesHelper args={[0.25, 0.25, 0.25]} layers={2} />
       </mesh>
     </group>
   );

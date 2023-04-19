@@ -12,7 +12,7 @@ var camera;
 var scene;
 var dragFlag = false;
 var counting = 0;
-var height = 0.5;
+var height = 1.7;
 var enableKeyboard = true;
 var enable = true;
 var footprint;
@@ -125,6 +125,18 @@ export default class MyFirstPersonControls {
     document.addEventListener("keyup", handleKeyUp);
   }
 
+  SetCamPosition(px, py, pz) {
+    camera.position.set(px, py, pz);
+  }
+
+  SetCamRotation(ex, ey, ez) {
+    camera.rotation.set(
+      (ex * Math.PI) / 180,
+      (ey * Math.PI) / 180,
+      (ez * Math.PI) / 180
+    );
+  }
+
   CreateFootprint(scene) {
     // Init footprint
     var runnerMaterial = new THREE.MeshBasicMaterial({
@@ -135,6 +147,7 @@ export default class MyFirstPersonControls {
     var runnerGeometry = new THREE.PlaneGeometry(0.15, 0.15, 1, 1);
     footprint = new THREE.Mesh(runnerGeometry, runnerMaterial);
     footprint.position.set(-100, -100, 0);
+    footprint.scale.set(3, 3, 3);
     scene.add(footprint);
   }
 
@@ -153,8 +166,8 @@ export default class MyFirstPersonControls {
     if (keyPressed[3]) camera.translateX(moveSpeed);
   }
 
-  CreateWalkArea(debug = 0.1) {
-    const geometry = new THREE.PlaneGeometry(10, 10, 1);
+  CreateWalkArea(debug = 0.1, size = 10) {
+    const geometry = new THREE.PlaneGeometry(size, size, 1);
     const material = new THREE.MeshBasicMaterial({
       color: 0x00ff00,
       opacity: debug,
@@ -165,6 +178,10 @@ export default class MyFirstPersonControls {
     floor.rotation.set(-Math.PI / 2, 0, 0);
     floor.name = "floor";
     scene.add(floor);
+  }
+
+  GetHeight() {
+    return height;
   }
 
   SetHeight(_value) {
