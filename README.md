@@ -71,13 +71,20 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 # Install
 
+```
 npx create-react-app .  
 npm install three@0.142 @react-three/fiber@8.0.26 --save-exact  
 npm install @react-three/drei@9.14.3 --save-exact  
-npm install @react-three/postprocessing@2.3.2 --save-exact  
-  
-Debug (Local server)  
+```  
+
+**OtherPack**  
+```
+npm install @react-three/postprocessing@2.3.2 --save-exact
+```
+   
+**Debug (Local server)**  
+```
 serve -s build  
+```
 https://www.npmjs.com/package/serve  
-  
-https://www.youtube.com/watch?v=kZ5M2Y_0wh0 
+https://www.youtube.com/watch?v=kZ5M2Y_0wh0  
