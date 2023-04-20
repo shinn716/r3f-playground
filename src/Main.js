@@ -1,27 +1,10 @@
-import {
-  Cloud,
-  CubeCamera,
-  Environment,
-  Float,
-  Html,
-  MeshReflectorMaterial,
-  OrbitControls,
-  PerspectiveCamera,
-  PointMaterial,
-  Points,
-  Sky,
-  Text,
-  useCursor,
-  useProgress,
-  useVideoTexture,
-} from "@react-three/drei";
-import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
-import React, { Suspense, useEffect, useRef, useState } from "react";
-import FirstPerson from "./components/FirstPerson/FirstPerson";
+import { useThree } from "@react-three/fiber";
+import React, { useEffect, useRef } from "react";
+import FirstPerson from "./components/FirstPerson";
 import DragController from "./components/DragController/DragController";
 import { Booth } from "./Booth";
 import { Stats } from "@react-three/drei";
-// import { Button, DatePicker } from "antd";
+import { MyEnvironment } from "./MyEnvironment";
 
 const Scene = () => {
   const { scene } = useThree();
@@ -33,17 +16,10 @@ const Scene = () => {
 
   camera.layers.enableAll();
 
-  console.log(scene.children);
+  // console.log(scene.children);
 
   useEffect(() => {
     for (let i = 0; i < scene.children.length; i++) {
-      // if (scene.children[i].name === "Sketchfab_Scene") {
-      //   camera.position.set(
-      //     scene.children[i].position.x,
-      //     0.17 * 3,
-      //     scene.children[i].position.z
-      //   );
-      // }
       if (scene.children[i].name === "cube") {
         objects.push(scene.children[i]);
       }
@@ -58,12 +34,14 @@ const Scene = () => {
         controlsref.current.enable(true);
       }
     );
+  }, []);
 
+  useEffect(() => {
     // set camera transfrom
     controlsref.current.setHeight(1.7);
     controlsref.current.setPosition(-0.24, 1.7, 0.1);
     controlsref.current.setRotation(0, -90, 0);
-  }, []);
+  }, [controlsref]);
 
   return (
     <>
@@ -96,28 +74,21 @@ function Box({ position, rotation, color }) {
   );
 }
 
-// function GUI() {
-//   return (
-//     <>
-//       <Button type="primary">PRESS ME</Button>
-//       <DatePicker placeholder="select date" />
-//     </>
-//   );
-// }
-
 export function Main() {
-  console.log("Main");
+  // console.log("Main");
 
   return (
     <>
       <Scene />
-      <Sky />
       <ambientLight intensity={0.5} />
       <directionalLight position={[5.3, 1.0, 2.4]} castShadow />
-      <Booth />
+      <MyEnvironment />
+      <Booth
+        targetUrl={"studio_apartment_vray_baked_textures_included/scene.gltf"}
+        position={[-0.2, 0, -0.1]}
+        scale={1}
+      />
       <Stats />
-      {/* <GUI /> */}
-      {/* <OrbitControls */}
     </>
   );
 }

@@ -1,7 +1,7 @@
 import * as THREE from "three";
-import { TWEEN } from "three/examples/jsm/libs/tween.module.min";
+import TWEEN from "@tweenjs/tween.js";
 
-const moveSpeed = 0.02;
+const moveSpeed = 0.025;
 const dragSpeed = 0.4;
 
 var keyPressed = [false, false, false, false];
@@ -17,6 +17,7 @@ var enableKeyboard = true;
 var enable = true;
 var footprint;
 var lastX, lastY;
+var walkableHeight = 0.3;
 
 export default class MyFirstPersonControls {
   constructor(_camera, _scene, _enableKeyboard) {
@@ -45,13 +46,13 @@ export default class MyFirstPersonControls {
       if (e.key === "d") keyPressed[3] = false;
     };
 
+    // listener
     document.onpointerdown = function (e) {
       if (enable) dragFlag = true;
       lastX = e.clientX;
       lastY = e.clientY;
     };
 
-    // listener
     document.onpointerup = function (e) {
       if (!enable) return;
 
@@ -109,6 +110,7 @@ export default class MyFirstPersonControls {
         raycaster_mover.setFromCamera(mouse_move, camera);
         const hits = raycaster_mover.intersectObjects(scene.children);
         if (footprint === undefined) return;
+        if (hits[0] === undefined) return;
         footprint.position.set(hits[0].point.x, 0.05, hits[0].point.z);
         footprint.lookAt(
           camera.position.x,
@@ -137,10 +139,12 @@ export default class MyFirstPersonControls {
     );
   }
 
+  // Init footprint
   CreateFootprint(scene) {
-    // Init footprint
     var runnerMaterial = new THREE.MeshBasicMaterial({
-      map: new THREE.TextureLoader().load("icons/footprints.png"),
+      map: new THREE.TextureLoader().load(
+        process.env.PUBLIC_URL + "/icons/footprints.png"
+      ),
       alphaTest: true,
       side: THREE.DoubleSide,
     });
@@ -174,7 +178,7 @@ export default class MyFirstPersonControls {
       transparent: true,
     });
     const floor = new THREE.Mesh(geometry, material);
-    floor.position.y = 0.1;
+    floor.position.y = walkableHeight;
     floor.rotation.set(-Math.PI / 2, 0, 0);
     floor.name = "floor";
     scene.add(floor);
