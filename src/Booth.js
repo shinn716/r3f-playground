@@ -1,3 +1,4 @@
+import { Float } from "@react-three/drei";
 import { useLoader } from "@react-three/fiber";
 import { useEffect } from "react";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";

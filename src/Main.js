@@ -1,94 +1,127 @@
-import { useThree } from "@react-three/fiber";
-import React, { useEffect, useRef } from "react";
-import FirstPerson from "./components/FirstPerson";
-import DragController from "./components/DragController/DragController";
-import { Booth } from "./Booth";
-import { Stats } from "@react-three/drei";
-import { MyEnvironment } from "./MyEnvironment";
+import * as THREE from "three";
+import { useFrame, useThree } from "@react-three/fiber";
+import React, { useRef } from "react";
+import { Environment, Reflector, Stats } from "@react-three/drei";
+import {
+  ChromaticAberration,
+  EffectComposer,
+} from "@react-three/postprocessing";
+import { geometry, material } from "./store";
 
-const Scene = () => {
-  const { scene } = useThree();
-  const { camera } = useThree();
-
-  const dragref = useRef();
-  const controlsref = useRef();
-  var objects = [];
-
-  camera.layers.enableAll();
-
-  // console.log(scene.children);
-
-  useEffect(() => {
-    for (let i = 0; i < scene.children.length; i++) {
-      if (scene.children[i].name === "cube") {
-        objects.push(scene.children[i]);
-      }
-    }
-
-    dragref.current.init(
-      objects,
-      () => {
-        controlsref.current.enable(false);
-      },
-      () => {
-        controlsref.current.enable(true);
-      }
-    );
-  }, []);
-
-  useEffect(() => {
-    // set camera transfrom
-    controlsref.current.setHeight(1.7);
-    controlsref.current.setPosition(-0.24, 1.7, 0.1);
-    controlsref.current.setRotation(0, -90, 0);
-  }, [controlsref]);
-
+function Sphere(props) {
   return (
-    <>
-      <FirstPerson ref={controlsref} />
-      <DragController ref={dragref} />
-      <Box
-        color={Math.random() * 0xffffff}
-        position={[1.8, 1.8, -0.3]}
-        rotation={[0, -1.57, 0]}
-      />
-      <Box
-        color={Math.random() * 0xffffff}
-        position={[1.8, 1.8, 0.1]}
-        rotation={[0, -1.57, 0]}
-      />
-    </>
+    <mesh
+      receiveShadow
+      castShadow
+      {...props}
+      renderOrder={-2000000}
+      geometry={geometry.sphere}
+      material={material.sphere}
+    />
   );
-};
+}
 
-function Box({ position, rotation, color }) {
-  const ref = useRef();
+function Spheres() {
+  const group = useRef();
+  useFrame(() => {
+    group.current.children[0].position.x = THREE.MathUtils.lerp(
+      group.current.children[0].position.x,
+      -18,
+      0.02
+    );
+    group.current.children[1].position.x = THREE.MathUtils.lerp(
+      group.current.children[1].position.x,
+      -10,
+      0.01
+    );
+    group.current.children[2].position.x = THREE.MathUtils.lerp(
+      group.current.children[2].position.x,
+      19,
+      0.03
+    );
+    group.current.children[3].position.x = THREE.MathUtils.lerp(
+      group.current.children[3].position.x,
+      10,
+      0.04
+    );
+  });
   return (
-    <group name="cube">
-      <mesh name="cube" position={position} rotation={rotation} ref={ref}>
-        <boxBufferGeometry args={[0.35, 0.35, 0.02]} attach="geometry" />
-        <meshPhongMaterial color={color} attach="material" />
-        <axesHelper args={[0.25, 0.25, 0.25]} layers={2} />
-      </mesh>
+    <group ref={group}>
+      <Sphere position={[-40, 1, 10]} />
+      <Sphere position={[-20, 10, -20]} scale={[10, 10, 10]} />
+      <Sphere position={[40, 3, 5]} scale={[3, 3, 3]} />
+      <Sphere position={[30, 0.75, 10]} scale={[0.75, 0.75, 0.75]} />
     </group>
   );
 }
 
-export function Main() {
-  // console.log("Main");
+function Zoom() {
+  const vec = new THREE.Vector3(0, 0, 100);
+  return useFrame((state) => {
+    state.camera.position.lerp(vec, 0.075);
+    state.camera.fov = THREE.MathUtils.lerp(state.camera.fov, 20, 0.075);
+    state.camera.lookAt(0, 0, 0);
+    state.camera.updateProjectionMatrix();
+  });
+}
 
+export function Main() {
   return (
     <>
-      <Scene />
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[5.3, 1.0, 2.4]} castShadow />
-      <MyEnvironment />
-      <Booth
-        targetUrl={"studio_apartment_vray_baked_textures_included/scene.gltf"}
-        position={[-0.2, 0, -0.1]}
-        scale={1}
+      <fog attach="fog" args={["#a0a0a0", 100, 150]} />
+      <color attach="background" args={["#a0a0a0"]} />
+      <spotLight
+        penumbra={1}
+        angle={0.35}
+        castShadow
+        position={[40, 80, 0]}
+        intensity={1}
+        shadow-mapSize={[256, 256]}
       />
+
+      <group position={[0, -12, 0]}>
+        <Spheres />
+        <mesh
+          rotation-x={-Math.PI / 2}
+          position={[0, 0.01, 0]}
+          scale={[200, 200, 200]}
+          receiveShadow
+          renderOrder={100000}
+        >
+          <planeBufferGeometry attach="geometry" />
+          <shadowMaterial
+            attach="material"
+            transparent
+            color="#251005"
+            opacity={0.2}
+          />
+        </mesh>
+        <Reflector
+          resolution={1024}
+          blur={[800, 50]}
+          mirror={0.4}
+          mixBlur={1}
+          mixStrength={0.5}
+          depthScale={1}
+          minDepthThreshold={0.7}
+          maxDepthThreshold={1}
+          rotation-x={-Math.PI / 2}
+          args={[100, 100]}
+          color="#d0d0d0"
+          metalness={1}
+          roughness={0.75}
+        />
+      </group>
+      <Environment preset="apartment" />
+      <Zoom />
       <Stats />
+
+      <EffectComposer>
+        <ChromaticAberration
+          radialModulation={true}
+          offset={[0.00175, 0.00175]}
+        />
+      </EffectComposer>
     </>
   );
 }
