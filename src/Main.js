@@ -1,23 +1,47 @@
 import * as THREE from "three";
-import { useFrame, useThree } from "@react-three/fiber";
-import React, { useRef } from "react";
-import { Environment, Reflector, Stats } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import React, { useEffect, useRef, useState } from "react";
+import {
+  Environment,
+  Html,
+  OrbitControls,
+  Reflector,
+  Stats,
+} from "@react-three/drei";
 import {
   ChromaticAberration,
   EffectComposer,
 } from "@react-three/postprocessing";
 import { geometry, material } from "./store";
+import TWEEN from "@tweenjs/tween.js";
 
 function Sphere(props) {
+  const meshRef = useRef();
+  const [buttonText, setButtonText] = useState("1");
+
+  useEffect(() => {
+    console.log(meshRef);
+    setButtonText(meshRef.current.uuid);
+  }, [meshRef]);
+
   return (
-    <mesh
-      receiveShadow
-      castShadow
-      {...props}
-      renderOrder={-2000000}
-      geometry={geometry.sphere}
-      material={material.sphere}
-    />
+    <>
+      <mesh
+        ref={meshRef}
+        receiveShadow
+        castShadow
+        {...props}
+        renderOrder={-2000000}
+        geometry={geometry.sphere}
+        material={material.sphere}
+      >
+        <Html distanceFactor={10}>
+          <div className="content" style={{ fontSize: 40 }}>
+            {buttonText}
+          </div>
+        </Html>
+      </mesh>
+    </>
   );
 }
 
@@ -55,14 +79,45 @@ function Spheres() {
   );
 }
 
+const Map = (x, in_min, in_max, out_min, out_max) => {
+  return ((x - in_min) * (out_max - out_min)) / (in_max - in_min) + out_min;
+};
+
 function Zoom() {
-  const vec = new THREE.Vector3(0, 0, 100);
-  return useFrame((state) => {
-    state.camera.position.lerp(vec, 0.075);
-    state.camera.fov = THREE.MathUtils.lerp(state.camera.fov, 20, 0.075);
-    state.camera.lookAt(0, 0, 0);
-    state.camera.updateProjectionMatrix();
+  const { camera, mouse } = useThree();
+  const [mystate, setmyState] = useState(false);
+  let value = 0;
+
+  useFrame(() => {
+    TWEEN.update();
+    setmyState(true);
+
+    // if (mouse.x > 0.45) value = 3;
+    // else if (mouse.x < -0.45) value = -3;
+    // else value = 0;
+    // camera.position.x = THREE.MathUtils.lerp(camera.position.x, value, 0.02);
+
+    // value = Map(mouse.x, -0.45, 0.45, -2, 2);
+    // camera.position.x = THREE.MathUtils.lerp(camera.position.x, value, 0.02);
   });
+
+  useEffect(() => {
+    const vec = new THREE.Vector3(0, 0, 100);
+    new TWEEN.Tween(camera.position)
+      .to(vec, 2000)
+      .easing(TWEEN.Easing.Sinusoidal.Out)
+      .start();
+
+    new TWEEN.Tween(camera)
+      .to({ fov: 20 }, 2000)
+      .easing(TWEEN.Easing.Sinusoidal.Out)
+      .start()
+      .onUpdate(() => {
+        camera.updateProjectionMatrix();
+      });
+
+    camera.lookAt(0, 0, 0);
+  }, [camera, mystate]);
 }
 
 export function Main() {
@@ -115,6 +170,7 @@ export function Main() {
       <Environment preset="apartment" />
       <Zoom />
       <Stats />
+      <OrbitControls />
 
       <EffectComposer>
         <ChromaticAberration
