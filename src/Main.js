@@ -3,8 +3,15 @@ import React, { useEffect, useRef } from "react";
 import FirstPerson from "./components/FirstPerson";
 import DragController from "./components/DragController/DragController";
 import { Booth } from "./Booth";
-import { Stats } from "@react-three/drei";
+import { Stats, Html } from "@react-three/drei";
 import { MyEnvironment } from "./MyEnvironment";
+import { useState } from "react";
+import {
+  Selection,
+  Select,
+  EffectComposer,
+  Outline,
+} from "@react-three/postprocessing";
 
 const Scene = () => {
   const { scene } = useThree();
@@ -47,29 +54,49 @@ const Scene = () => {
     <>
       <FirstPerson ref={controlsref} />
       <DragController ref={dragref} />
-      <Box
-        color={Math.random() * 0xffffff}
-        position={[1.8, 1.8, -0.3]}
-        rotation={[0, -1.57, 0]}
-      />
-      <Box
-        color={Math.random() * 0xffffff}
-        position={[1.8, 1.8, 0.1]}
-        rotation={[0, -1.57, 0]}
-      />
+
+      <Selection>
+        <EffectComposer multisampling={8} autoClear={false}>
+          <Outline visibleEdgeColor="white" edgeStrength={10} width={500} />
+        </EffectComposer>
+
+        <Box
+          color={Math.random() * 0xffffff}
+          position={[1.8, 1.8, -0.3]}
+          rotation={[0, -1.57, 0]}
+        />
+        <Box
+          color={Math.random() * 0xffffff}
+          position={[1.8, 1.8, 0.1]}
+          rotation={[0, -1.57, 0]}
+        />
+      </Selection>
     </>
   );
 };
 
 function Box({ position, rotation, color }) {
   const ref = useRef();
+  const [hovered, hover] = useState(null);
   return (
     <group name="cube">
-      <mesh name="cube" position={position} rotation={rotation} ref={ref}>
-        <boxBufferGeometry args={[0.35, 0.35, 0.02]} attach="geometry" />
-        <meshPhongMaterial color={color} attach="material" />
-        <axesHelper args={[0.25, 0.25, 0.25]} layers={2} />
-      </mesh>
+      <Select enabled={hovered}>
+        <mesh
+          name="cube"
+          position={position}
+          rotation={rotation}
+          ref={ref}
+          onClick={() => {
+            console.log("box");
+          }}
+          onPointerOver={() => hover(true)}
+          onPointerOut={() => hover(false)}
+        >
+          <boxBufferGeometry args={[0.35, 0.35, 0.02]} attach="geometry" />
+          <meshPhongMaterial color={color} attach="material" />
+          <axesHelper args={[0.25, 0.25, 0.25]} layers={2} />
+        </mesh>
+      </Select>
     </group>
   );
 }
