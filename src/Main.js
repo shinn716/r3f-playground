@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import React, { useEffect, useRef, useState } from "react";
 import {
   Environment,
@@ -7,6 +7,7 @@ import {
   OrbitControls,
   Reflector,
   Stats,
+  useCursor,
 } from "@react-three/drei";
 import {
   ChromaticAberration,
@@ -17,10 +18,12 @@ import TWEEN from "@tweenjs/tween.js";
 
 function Sphere(props) {
   const meshRef = useRef();
-  const [buttonText, setButtonText] = useState("1");
+  const [buttonText, setButtonText] = useState("");
+  const [hovered, hover] = useState(null);
+  useCursor(hovered);
 
   useEffect(() => {
-    console.log(meshRef);
+    // console.log(meshRef);
     setButtonText(meshRef.current.uuid);
   }, [meshRef]);
 
@@ -36,7 +39,15 @@ function Sphere(props) {
         material={material.sphere}
       >
         <Html distanceFactor={10}>
-          <div className="content" style={{ fontSize: 40 }}>
+          <div
+            className="content"
+            style={{ fontSize: 40 }}
+            onPointerOver={() => hover(true)}
+            onPointerOut={() => hover(false)}
+            onClick={() => {
+              console.log(meshRef.current.uuid);
+            }}
+          >
             {buttonText}
           </div>
         </Html>
@@ -139,7 +150,7 @@ export function Main() {
         <mesh
           rotation-x={-Math.PI / 2}
           position={[0, 0.01, 0]}
-          scale={[200, 200, 200]}
+          scale={[300, 300, 300]}
           receiveShadow
           renderOrder={100000}
         >
@@ -170,7 +181,7 @@ export function Main() {
       <Environment preset="apartment" />
       <Zoom />
       <Stats />
-      <OrbitControls />
+      <OrbitControls maxPolarAngle={Math.PI / 2} />
 
       <EffectComposer>
         <ChromaticAberration
