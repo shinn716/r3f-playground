@@ -3,6 +3,7 @@ import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import TWEEN from "@tweenjs/tween.js";
 import useKeyboard from "./useKeyboard";
+import { useStore } from "./useStore";
 
 // import MyFirstPersonControls from "./MyFirstPersonControls";
 
@@ -24,6 +25,7 @@ const FirstPerson = forwardRef((props, ref) => {
   const { scene } = useThree();
   const footprintRef = useRef(null);
   const keyMap = useKeyboard();
+  const store = useStore();
 
   const tex2Dfootprint = useLoader(
     THREE.TextureLoader,
@@ -71,6 +73,7 @@ const FirstPerson = forwardRef((props, ref) => {
   };
 
   document.onpointerup = function (e) {
+    if (!store.enableFPSControls) return;
     if (!enable) return;
     dragFlag = false;
     counting = 0;
@@ -106,6 +109,7 @@ const FirstPerson = forwardRef((props, ref) => {
   };
 
   document.onpointermove = function (e) {
+    if (!store.enableFPSControls) return;
     if (!enable) return;
     if (isClick) {
       var deltaX = e.clientX - lastX;
@@ -153,6 +157,7 @@ const FirstPerson = forwardRef((props, ref) => {
   useFrame((_, delta) => {
     // controller?.Update();
 
+    if (!store.enableFPSControls) return;
     if (!enable) return;
     TWEEN.update();
 

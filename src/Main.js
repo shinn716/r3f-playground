@@ -1,5 +1,5 @@
 import { useThree } from "@react-three/fiber";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import FirstPerson from "./components/FirstPerson";
 import DragController from "./components/DragController";
 import { Booth } from "./Booth";
@@ -12,6 +12,8 @@ import {
   EffectComposer,
   Outline,
 } from "@react-three/postprocessing";
+import { useStore } from "./components/FirstPerson/useStore";
+import * as THREE from "three";
 
 const Scene = () => {
   const { scene } = useThree();
@@ -19,6 +21,10 @@ const Scene = () => {
 
   const dragref = useRef();
   const controlsref = useRef();
+  const store = useStore();
+  let myColor1 = useMemo(() => new THREE.Color(Math.random() * 0xffffff), []);
+  let myColor2 = useMemo(() => new THREE.Color(Math.random() * 0xffffff), []);
+
   var objects = [];
 
   camera.layers.enableAll();
@@ -34,9 +40,11 @@ const Scene = () => {
     dragref.current.init(
       objects,
       () => {
+        // store.enableFPSControls = false;
         controlsref.current.enable(false);
       },
       () => {
+        // store.enableFPSControls = true;
         controlsref.current.enable(true);
       }
     );
@@ -60,12 +68,12 @@ const Scene = () => {
         </EffectComposer>
 
         <Box
-          color={Math.random() * 0xffffff}
+          color={myColor1}
           position={[1.8, 1.8, -0.3]}
           rotation={[0, -1.57, 0]}
         />
         <Box
-          color={Math.random() * 0xffffff}
+          color={myColor2}
           position={[1.8, 1.8, 0.1]}
           rotation={[0, -1.57, 0]}
         />

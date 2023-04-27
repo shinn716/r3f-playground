@@ -16,6 +16,7 @@
     "react-scripts": "5.0.1",
     "stats.js": "^0.17.0",
     "three": "0.142.0",
+    "valtio": "^1.10.4",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
