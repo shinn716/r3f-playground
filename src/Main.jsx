@@ -59,7 +59,13 @@ const Scene = () => {
 
   return (
     <>
-      <FirstPerson ref={controlsref} sizex={10} sizey={10} debug={0.1} />
+      <FirstPerson
+        ref={controlsref}
+        sizex={10}
+        sizey={10}
+        debug={0.1}
+        enable={true}
+      />
       <DragController ref={dragref} />
 
       <Selection>
