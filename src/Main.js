@@ -1,9 +1,9 @@
 import { useThree } from "@react-three/fiber";
 import React, { useEffect, useRef } from "react";
 import FirstPerson from "./components/FirstPerson";
-import DragController from "./components/DragController/DragController";
+import DragController from "./components/DragController";
 import { Booth } from "./Booth";
-import { Stats, Html } from "@react-three/drei";
+import { Stats } from "@react-three/drei";
 import { MyEnvironment } from "./MyEnvironment";
 import { useState } from "react";
 import {
@@ -22,7 +22,6 @@ const Scene = () => {
   var objects = [];
 
   camera.layers.enableAll();
-
   // console.log(scene.children);
 
   useEffect(() => {
@@ -52,7 +51,7 @@ const Scene = () => {
 
   return (
     <>
-      <FirstPerson ref={controlsref} />
+      <FirstPerson ref={controlsref} sizex={10} sizey={10} debug={0.1} />
       <DragController ref={dragref} />
 
       <Selection>

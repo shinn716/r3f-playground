@@ -1,11 +1,13 @@
 import { DragControls } from "three/examples/jsm/controls/DragControls";
 import { useThree } from "@react-three/fiber";
-import { forwardRef, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { Utils } from "./Utils";
+import { Vector3 } from "three";
 
 const DragController = forwardRef((props, ref) => {
   const { camera, gl } = useThree();
   const { scene } = useThree();
+  const mypoint = useMemo(() => new Vector3(0, 0, 0), []);
   let px, py, pz;
 
   useImperativeHandle(ref, () => ({
@@ -30,14 +32,11 @@ const DragController = forwardRef((props, ref) => {
           hits[0].object.name !== "" &&
           hits[0].object.name !== "cube"
         ) {
-          event.object.position.set(
-            hits[0].point.x,
-            hits[0].point.y,
-            hits[0].point.z
-          );
-          px = hits[0].point.x;
-          py = hits[0].point.y;
-          pz = hits[0].point.z;
+          mypoint.set(hits[0].point.x, hits[0].point.y, hits[0].point.z);
+          event.object.position.set(mypoint.x, mypoint.y, mypoint.z);
+          px = mypoint.x;
+          py = mypoint.y;
+          pz = mypoint.z;
 
           let dir = Utils.CalcuteNormalDirection(hits[0]);
           event.object.lookAt(dir.x, dir.y, dir.z);
