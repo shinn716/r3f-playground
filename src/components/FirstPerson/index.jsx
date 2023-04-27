@@ -19,6 +19,7 @@ var camry = 0;
 var height = 1.7;
 var enable = true;
 var enableKeyboard = true;
+var footprintHeight = 0.05;
 
 const FirstPerson = forwardRef((props, ref) => {
   const { camera } = useThree();
@@ -35,10 +36,8 @@ const FirstPerson = forwardRef((props, ref) => {
   useImperativeHandle(ref, () => ({
     enable(_enable) {
       enable = _enable;
-      // controller.Enable(value);
     },
     setPosition(px, py, pz) {
-      // controller.SetCamPosition(px, py, pz);
       camera.position.set(px, py, pz);
     },
     setRotation(rx, ry, rz) {
@@ -47,19 +46,17 @@ const FirstPerson = forwardRef((props, ref) => {
         (ry * Math.PI) / 180,
         (rz * Math.PI) / 180
       );
-      // controller.SetCamRotation(rx, ry, rz);
     },
     setHeight(_height) {
       height = _height;
-      // controller.SetHeight(height);
     },
     getHeight() {
       return height;
-      // return controller.GetHeight();
+    },
+    setFootprintHeight(_height) {
+      footprintHeight = _height;
     },
   }));
-
-  // const controller = new MyFirstPersonControls(camera, scene, true);
 
   const raycaster_mover = new THREE.Raycaster();
   const raycaster_click = new THREE.Raycaster();
@@ -137,7 +134,11 @@ const FirstPerson = forwardRef((props, ref) => {
       if (hits[0] === undefined) return;
 
       footprintRef.current.visible = true;
-      footprintRef.current.position.set(hits[0].point.x, 0.05, hits[0].point.z);
+      footprintRef.current.position.set(
+        hits[0].point.x,
+        footprintHeight,
+        hits[0].point.z
+      );
       footprintRef.current.lookAt(
         camera.position.x,
         camera.position.y + 90,
@@ -147,16 +148,11 @@ const FirstPerson = forwardRef((props, ref) => {
   };
 
   useEffect(() => {
-    // controller.CreateFootprint(scene);
-    // controller.CreateWalkArea(0.1, 20);
-
     camera.near = 0.01;
     camera.updateProjectionMatrix();
   }, []);
 
   useFrame((_, delta) => {
-    // controller?.Update();
-
     if (!store.enableFPSControls) return;
     if (!enable) return;
     TWEEN.update();
@@ -175,6 +171,7 @@ const FirstPerson = forwardRef((props, ref) => {
 
   return (
     <>
+      {(enable = props.enable)}
       <mesh name="footprint" ref={footprintRef}>
         <planeGeometry args={[0.4, 0.4, 1, 1]} attach="geometry" />
         <meshBasicMaterial
