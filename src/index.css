@@ -28,3 +28,15 @@ body,
   width: 40px;
   background: black;
 }
+
+.hotspot {
+  padding-top: 15px;
+  transform: translate3d(calc(-50%), -300px, 0);
+  text-align: center;
+  background: #202035;
+  color: white;
+  padding: 15px 15px;
+  border-radius: 20px;
+  white-space: nowrap;
+  pointer-events: none;
+}

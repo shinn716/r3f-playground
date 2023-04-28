@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import FirstPerson from "./components/FirstPerson";
 import DragController from "./components/DragController";
 import { Booth } from "./Booth";
-import { Stats } from "@react-three/drei";
+import { Html, RenderTexture, Stats } from "@react-three/drei";
 import { MyEnvironment } from "./MyEnvironment";
 import { useState } from "react";
 import {
@@ -90,7 +90,16 @@ const Scene = () => {
 
 function Box({ position, rotation, color }) {
   const ref = useRef();
+  const nameBoxRef = useRef();
   const [hovered, hover] = useState(null);
+  const [name, setname] = useState("none");
+
+  useEffect(() => {
+    // if (nameBoxRef.current === undefined) return;
+    console.log(ref.current);
+    setname(ref.current.uuid);
+  }, [ref]);
+
   return (
     <group name="cube">
       <Select enabled={hovered}>
@@ -102,9 +111,20 @@ function Box({ position, rotation, color }) {
           onClick={() => {
             console.log("box");
           }}
-          onPointerOver={() => hover(true)}
-          onPointerOut={() => hover(false)}
+          onPointerOver={() => {
+            hover(true);
+            nameBoxRef.current.style.visibility = "visible";
+          }}
+          onPointerOut={() => {
+            hover(false);
+            nameBoxRef.current.style.visibility = "hidden";
+          }}
         >
+          <Html distanceFactor={1} ref={nameBoxRef}>
+            <div className="hotspot" style={{ fontSize: 60 }}>
+              {name}
+            </div>
+          </Html>
           <boxBufferGeometry args={[0.35, 0.35, 0.02]} attach="geometry" />
           <meshPhongMaterial color={color} attach="material" />
           <axesHelper args={[0.25, 0.25, 0.25]} layers={2} />

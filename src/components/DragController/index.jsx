@@ -8,7 +8,11 @@ const DragController = forwardRef((props, ref) => {
   const { camera, gl } = useThree();
   const { scene } = useThree();
   const mypoint = useMemo(() => new Vector3(0, 0, 0), []);
-  let px, py, pz;
+  // let px, py, pz;
+
+  let px = useMemo(() => 0, []);
+  let py = useMemo(() => 0, []);
+  let pz = useMemo(() => 0, []);
 
   useImperativeHandle(ref, () => ({
     init(objs, dragstart, dragend) {
@@ -23,7 +27,7 @@ const DragController = forwardRef((props, ref) => {
 
       controls.addEventListener("drag", function (event) {
         const raycaster = controls.getRaycaster();
-        const hits = raycaster.intersectObjects(scene.children);
+        const hits = raycaster.intersectObjects(scene.children, true);
 
         if (hits[0] === undefined) return;
 
